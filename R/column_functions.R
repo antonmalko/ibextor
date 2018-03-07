@@ -16,7 +16,7 @@ count_columns <- function(file_name){
   return(n_cols)
 }
 
-set_column_names <- function(n_cols, col_names, partial_names = TRUE){
+set_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
 
   #' A function to provide default names for columns and ensure that
   #' every column has a name
@@ -32,7 +32,7 @@ set_column_names <- function(n_cols, col_names, partial_names = TRUE){
   #'                      for all columns
   #' @return vector with column names
 
-  if (missing(col_names)){
+  if (is.null(col_names)){
     if (partial_names) {
       col_names <- c (paste0("Col",seq(from=8, to=n_cols)))
     } else {
@@ -68,16 +68,17 @@ set_column_names <- function(n_cols, col_names, partial_names = TRUE){
 
   # If there are fewer column names specified than there are columns in the data,
   # add dummy column names with a warning
-  if (n_cols>length(col_names))
+  if (n_cols>length(col_names)){
     col_names <- c (col_names, paste0("Col",seq(from=length(col_names)+1, to=n_cols)))
     warning("There are more columns than column names provided. ",
             "Adding dummy column names")
+  }
 
   return(col_names)
 
 }
 
-set_column_classes <- function(n_cols, col_classes, partial_classes = TRUE){
+set_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TRUE){
 
   #' A function to provide default names for columns and ensure that
   #' every column has a name
@@ -96,7 +97,7 @@ set_column_classes <- function(n_cols, col_classes, partial_classes = TRUE){
   #'
   #' @return vector with column classes
 
-  if (missing(col_classes)){
+  if (is.null(col_classes)){
     if (partial_classes) {
       col_classes <- rep(NA, times = n_cols - 7)
     } else {
@@ -149,7 +150,7 @@ auto_determine_del_col <- function(d){
   # If only one controller is specified, we can delete the column. By the time
   # the current function is called, we have already subsetted the main dataset
   # for only the controllers that we want.
-  if (length(unique(d$controller))==1) del_col <- c(del_col, auto = 3)
+  if (length(unique(d[,3]))==1) del_col <- c(del_col, auto = 3)
 
   # The 5th column is the element number. If there is just one element number,
   # the column is not useful and can be safely deleted
