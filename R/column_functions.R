@@ -180,9 +180,22 @@ auto_determine_del_col <- function(d){
 
   # --- Controller specific
 
+  # For "DashedSentence" in "self-paced reading" mode Column 11 contains info
+  # on whether there was a line break between the current and the following word.
+  # If all sentences in the experiment fit on the same line, this column always
+  # contains FALSE and thus is not necessary
   if (all(d[,3] == "DashedSentence") && ncol(d) >= 12 && all(d[,11] == FALSE)){
     del_col <- c(del_col, `Auto (contains only FALSE values)` = 11)
   }
+
+  # For "Question", Column 10 contains the info on whether the question was
+  # answered correctly. If an answer was not specified in Ibex, this column
+  # will always contain NULLs and thus is not necessary
+
+  if (all(d[,3] == "Question") && all(is.null(d[,10]))){
+    del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
+  }
+
 
   return(del_col)
 }
@@ -230,7 +243,7 @@ report_del_col <- function(del_col, d_colnames){
 
 }
 
-  delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixed")){
+delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixed")){
   #' A function to delete columns from the data based on data and/or user requests.
   #'
   #' @param d data.frame the columns of which are to be deleted
@@ -238,7 +251,7 @@ report_del_col <- function(del_col, d_colnames){
   #' @param del_mode how to determine which columns have to be deleted. Can be one of:
   #'          `auto` (decide based on data), `user` (only take into account
   #'          user's requests), `mixed` (take into account user request and data).
-  #'          `auto` is used by defualt if "del_col" is not specified; if it is,
+  #'          `auto` is used by default if "del_col" is not specified; if it is,
   #'          `mixed` is used. See Details
   #' @return data.frame `d` with deleted columns
   #' @export
