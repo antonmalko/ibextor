@@ -51,19 +51,37 @@ check_missing <-  function (x, string, name) {
 #     }
 #   }
 
-# recode_subjects <- function(d, timestamp_col = "timestamp", md5_col = "md5_hash"){
-#
-#   if (!timestamp_col %in% colnames(d)) stop ("timestamp column not found in the data!")
-#   if (!md5_col %in% colnames(d)) stop ("md5_hash column not found in the data!")
-#
-#   subject_dic <- data.frame(subj_uid = factor(sort(paste0(d[[timestamp_col]], "_", d[[md5_col]]))))
-#
-#   # if (anyDuplicated(subject_dic)){
-#   #   subject_uid_duplicates <- subject_dic$subj[duplicated(subject_dic$subj)]
-#   #   stop("Subjects UIDs are not unique! The following UIDs are duplicated: ", subject_uid_duplicates)
-#   # }
-#
-#   subject_dic$subj <- as.numeric(subject_dic$subj_uid)
-#
-#   return(subject_dic)
-# }
+recode_subjects <- function(d, short_ids = TRUE){
+
+  #' Set unique subject IDs
+  #'
+  #' Ibex provides 2 pieces of information identifying a participant: timestamp
+  #' of the moment when the results and md5 hash of browser and system
+  #' information. Neither of these parameters in itself is guaranteed to be
+  #' unique; their combination has more chances of being so.
+  #'
+  #' This function merges the timestamp and md5 into a single string (separated
+  #' by "_"), and puts it into `subj_uid` column (which replaces the `timestamp`
+  #' column. If necessary, timestamp can be extracted by simply breaking the
+  #' combined string at "_").
+  #'
+  #' @param d data.frame with (a subset of) Ibex data
+  #' @param short_ids logical. If `FALSE`, just merge timestamp and md5 hash
+  #'   together, If `TRUE` (default), add a new column with a simple index to
+  #'   idenitfy subjects. One index is assigned to each combination of timestamp
+  #'   and browser md5 hash. The column is put at the place of `subj_uid`
+  #'   column, and `subj_uid` column is moved at the very end of the data.frame
+  #'   (in order not to interfere with column deletion; otherwise we would have
+  #'   to offset the indices of columns specified for deletion by 1).
+  #' @return data.frame with updated subject codes
+
+  d[,1] <- factor(sort(paste0(d[,1], "_", d[,2])))
+  colnames(d)[1] <- "subj_uid"
+
+  if(short_ids){
+    d <- d[, c(setdiff(colnames(d), "subj_uid"), "subj_uid")]
+    d <- cbind(subj = factor(as.numeric(d$subj_uid)), d)
+  }
+
+  return(d)
+}
