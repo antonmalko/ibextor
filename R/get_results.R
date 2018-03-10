@@ -3,21 +3,76 @@ read_ibex <- function(file_name,
                       col_classes = NULL, partial_classes = TRUE, ...){
 
   # count the columns in the input file, set their names and classes
-  n_cols <- count_columns(file_name)
-  col_names <- set_column_names(n_cols, col_names, partial_names)
-  col_classes <- set_column_classes(n_cols, col_classes, partial_classes)
+  # n_cols <- count_columns(file_name)
+  # col_names <- set_column_names(n_cols, col_names, partial_names)
+  # col_classes <- set_column_classes(n_cols, col_classes, partial_classes)
 
+  n_cols <- max(count.fields(file_name, sep = ","))
   # read the file
   d <- read.csv(file_name, header=FALSE, fill=TRUE, comment.char="#",
-                col.names=col_names,
-                colClasses=col_classes,
-                as.is=FALSE, ...)
+                col.names= paste0("V", seq_len(n_cols)), # make sure that all columns are read in
+                #colClasses=col_classes,
+                stringsAsFactors = FALSE,
+                ...)
+
+
 
   return(d)
 
 }
 
-get_results <- function(file_name,
+subset_ibex <- function(d,
+                        controller,
+                        elem_number = NULL
+                        ){
+
+  tmp <- check_missing(controller, d[[3]], "controllers")
+  check_missing(elem_number, d[[5]], "elem.numbers")
+
+  # We can pass a vector of controllers, but since different
+  # controllers create different number of columns, the
+  # result may not be what we want. Let user know about it.
+  if (length(controller)-tmp >1) {warning (length(controller)-tmp, " existing controllers requested.",
+                                           "The columns may contain inconsistent info.\n")  }
+
+  #------------------------------------
+
+  # If elem.number specified subset with it; otherwise - without it
+  if (!is.null(elem_number)){
+    res <- d[(d[[3]] %in% controller) & (d[[5]] %in% elem_number),]}
+  else {
+    res <- d[d[[3]] %in% controller, ]
+  }
+
+  res <- droplevels(res)
+
+  # we don't need old row counts, so we delete them
+  rownames(res) <- NULL
+
+  # if the number of rows of the data set is zero
+  # then probably the subsetting didn't work.
+  if (NROW(res) == 0) {
+    stop("The subsetting resulted in empty data.frame. Check the following parameters ",
+         "for correctness: `controller`, `elem_number` \n")
+  }
+
+  return(res)
+}
+
+format_ibex <- function(d,
+                        col_names = NULL, partial_names = TRUE,
+                        col_classes = NULL, partial_classes = TRUE){
+
+  n_cols <- ncol(d)
+  col_names <- make_column_names(n_cols, col_names, partial_names)
+  col_classes <- make_column_classes(n_cols, col_classes, partial_classes)
+
+  colnames(d) <- col_names
+  d <- set_column_classes(d, col_classes)
+
+}
+
+get_results <- function(d,
                         controller,
                         elem_number = NULL,
                         del_col = NULL, del_mode = "auto",
@@ -110,14 +165,14 @@ get_results <- function(file_name,
 
 
   # ----- Check input parameters------
-  if (!is.character(file_name)){stop ("file_name should be character")}
+  if (!is.data.frame(d)){stop ("d should be a data frame")}
   if (is.character(controller)==FALSE) {stop ("controller should be a character")}
   if ((is.numeric(elem_number)==FALSE) &(is.null(elem_number)==FALSE)) {stop ("elem.number should be numeric")}
   # if ((is.numeric(del_col)==FALSE)&(is.null(del.col)==FALSE)) {stop ("del.col should be numeric")}
   if ((is.character(col_names)==FALSE) &(is.null(col_names)==FALSE)){stop ("col_names should be character")}
 
 
-  d <- read_ibex(file_name, col_names, partial_names, col_classes, partial_classes, ...)
+  # d <- read_ibex(file_name, col_names, partial_names, col_classes, partial_classes, ...)
   #------------------------------------
   # check whether all the parameters provided are in the data. Report which ones are not
 
