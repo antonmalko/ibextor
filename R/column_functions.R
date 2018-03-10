@@ -48,7 +48,7 @@ set_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
   # unless we provided a full set of column names, provide default names for
   # the first seven columns - they are the same in all default Ibex controllers
   if (partial_names){
-    col_names <-  c("subject",
+    col_names <-  c("timestamp",
                     "md5_hash",
                     "controller",
                     "item_number",
@@ -171,6 +171,11 @@ report_del_col <- function(del_col, d_colnames){
   #' @param d_colnames Vector of columns names (used to report more informatively
   #'                   which columns were deleted)
   #' @return data.frame with deleted columns info
+  #'
+
+  if (is.null(del_col)){
+    return(NULL)
+  }
 
   # create empty data.frame for info about deleted columns
   del_col_info <- data.frame(matrix(ncol=3, nrow=length(del_col),
@@ -201,7 +206,7 @@ report_del_col <- function(del_col, d_colnames){
 
 }
 
-delete_columns <- function(d, del_col, del_mode = c("auto", "user", "mixed")){
+  delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixed")){
   #' A function to delete columns from the data based on data and/or user requests.
   #'
   #' @param d data.frame the columns of which are to be deleted
@@ -258,16 +263,26 @@ delete_columns <- function(d, del_col, del_mode = c("auto", "user", "mixed")){
 
   # if some columns are specified for deletion, assume that auto deletion
   # should still ap[ply to unsepcified columns.
-  if (!missing(del_col) & del_mode == "auto") del_mode <- "mixed"
+  if (!is.null(del_col) & del_mode == "auto") del_mode <- "mixed"
 
   base::switch(del_mode,
-               auto = {del_col <- auto_determine_del_col(d)}, # select columns for deletions based on the data
-               user = {del_col <- sort(unique(del_col)) # use columns provided by the user
-               names(del_col) <- rep("user", times = length(del_col))}, # and remember that they were provided by the user
-               mixed = {del_col <- unique(del_col)
-               names(del_col) <- rep("user", times = length(del_col))
-               del_col_auto <- auto_determine_del_col(d)
-               del_col <- sort(c(del_col, del_col_auto[!del_col_auto %in% del_col]))})
+               auto = {
+                 del_col <- auto_determine_del_col(d)
+               }, # select columns for deletions based on the data
+
+               user = {
+                 if (!is.null(del_col)) {
+                   del_col <- sort(unique(del_col)) # use columns provided by the user
+                   names(del_col) <- rep("user", times = length(del_col)) # and remember that they were provided by the user
+                 }
+               },
+
+               mixed = {
+                 del_col <- unique(del_col)
+                 names(del_col) <- rep("user", times = length(del_col))
+                 del_col_auto <- auto_determine_del_col(d)
+                 del_col <- sort(c(del_col, del_col_auto[!del_col_auto %in% del_col]))
+               })
 
   del_col_info <- report_del_col(del_col, colnames(d))
 

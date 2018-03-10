@@ -1,7 +1,26 @@
+read_ibex <- function(file_name,
+                      col_names = NULL, partial_names = TRUE,
+                      col_classes = NULL, partial_classes = TRUE, ...){
+
+  # count the columns in the input file, set their names and classes
+  n_cols <- count_columns(file_name)
+  col_names <- set_column_names(n_cols, col_names, partial_names)
+  col_classes <- set_column_classes(n_cols, col_classes, partial_classes)
+
+  # read the file
+  d <- read.csv(file_name, header=FALSE, fill=TRUE, comment.char="#",
+                col.names=col_names,
+                colClasses=col_classes,
+                as.is=FALSE, ...)
+
+  return(d)
+
+}
+
 get_results <- function(file_name,
                         controller,
                         elem_number = NULL,
-                        del_col, del_mode = "auto",
+                        del_col = NULL, del_mode = "auto",
                         col_names = NULL, partial_names = TRUE,
                         col_classes = NULL, partial_classes = TRUE,
                         recode_subjects = TRUE,
@@ -95,19 +114,10 @@ get_results <- function(file_name,
   if (is.character(controller)==FALSE) {stop ("controller should be a character")}
   if ((is.numeric(elem_number)==FALSE) &(is.null(elem_number)==FALSE)) {stop ("elem.number should be numeric")}
   # if ((is.numeric(del_col)==FALSE)&(is.null(del.col)==FALSE)) {stop ("del.col should be numeric")}
-  if ((is.character(col_names)==FALSE) &(is.null(col_names)==FALSE)){stop ("col.names should be character")}
+  if ((is.character(col_names)==FALSE) &(is.null(col_names)==FALSE)){stop ("col_names should be character")}
 
-  # count the columns in the input file, set their names and classes
-  n_cols <- count_columns(file_name)
-  col_names <- set_column_names(n_cols, col_names, partial_names)
-  col_classes <- set_column_classes(n_cols, col_classes, partial_classes)
 
-  # read the file
-  d <- read.csv(file_name, header=FALSE, fill=TRUE, comment.char="#",
-                  col.names=col_names,
-                  colClasses=col_classes,
-                  as.is=FALSE, ...)
-
+  d <- read_ibex(file_name, col_names, partial_names, col_classes, partial_classes, ...)
   #------------------------------------
   # check whether all the parameters provided are in the data. Report which ones are not
 
@@ -138,14 +148,17 @@ get_results <- function(file_name,
   # then probably the subsetting didn't work.
   if (NROW(res) == 0) {
     stop("The subsetting resulted in empty data.frame. Check the following parameters ",
-"for correctness: `controller`, `elem_number` \n")
+         "for correctness: `controller`, `elem_number` \n")
   }
 
-  if (recode_subjects) {
-    res <- recode_subjects(res)
-  }
+  res[,1] <- factor(sort(paste0(res[,1], "_", res[,2])))
+  colnames(res)[1] <- "subj_uid"
 
   res <- delete_columns(res, del_col, del_mode)
+
+  if(recode_subjects){
+    res <- cbind(subj = as.numeric(res$subj_uid), res)
+  }
 
   return(res)
 
