@@ -16,7 +16,7 @@ count_columns <- function(file_name){
   return(n_cols)
 }
 
-set_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
+make_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
 
   #' A function to provide default names for columns and ensure that
   #' every column has a name
@@ -78,7 +78,7 @@ set_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
 
 }
 
-set_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TRUE){
+make_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TRUE){
 
   #' A function to provide default names for columns and ensure that
   #' every column has a name
@@ -112,8 +112,8 @@ set_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TRU
   # unless we provided a full set of column classes, provide default classes for
   # the first seven columns
   if (partial_classes){
-    col_classes <-  c("factor", "character", "character",
-                    "numeric","numeric", "character","character",
+    col_classes <-  c("character", "character", "character",
+                    "numeric","numeric", "character","factor",
                     col_classes)
   }
 
@@ -138,28 +138,51 @@ set_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TRU
   return(col_classes)
 }
 
+set_column_classes <- function(d, col_classes){
+  res <- lapply(1:ncol(d), function(i){
+    FUN <- switch(col_classes[i],
+                  character = as.character,
+                  numeric = as.numeric,
+                  integer = as.integer,
+                  complex = as.complex,
+                  logical = as.logical,
+                  factor = as.factor)
+    FUN(d[,i])
+  })
+
+  names(res) <- colnames(d)
+  res <- as.data.frame(res, stringsAsFactors = FALSE)
+}
+
 auto_determine_del_col <- function(d){
   #' Helper function to auto-determine columns to be deleted
   #'
   #' @param data.frame from which columns are to be deleted
   #' @return vector with number of columns to be deleted
 
-  del_col = c(auto = 2) # remove md5 hash by default
+  del_col = c(`Auto (md5 hash usually not needed for analysis)` = 2) # remove md5 hash by default
 
   # The 3rd column is the controller column.
   # If only one controller is specified, we can delete the column. By the time
   # the current function is called, we have already subsetted the main dataset
   # for only the controllers that we want.
-  if (length(unique(d[,3]))==1) del_col <- c(del_col, auto = 3)
+  if (length(unique(d[,3]))==1) del_col <- c(del_col,
+                                             `Auto (only one controller exists)` = 3)
 
   # The 5th column is the element number. If there is just one element number,
   # the column is not useful and can be safely deleted
-  if (length(unique(d[,5]))==1) del_col <- c(del_col, auto = 5)
+  if (length(unique(d[,5]))==1) del_col <- c(del_col, `Auto (only one elem.number exists)` = 5)
 
   # The 7-th column in IBEX results is the group number. It is used in Latin
   # Square designs. If it is unused, IBEX returns NULL.  The column in this case
   # is of no use.
-  if (all(d[,7] == "NULL")) del_col <- c(del_col, auto = 7)
+  if (all(d[,7] == "NULL")) del_col <- c(del_col, `Auto (contains only NULL values)` = 7)
+
+  # --- Controller specific
+
+  if (all(d[,3] == "DashedSentence") && ncol(d) >= 12 && all(d[,11] == FALSE)){
+    del_col <- c(del_col, `Auto (contains only FALSE values)` = 11)
+  }
 
   return(del_col)
 }
@@ -185,22 +208,23 @@ report_del_col <- function(del_col, d_colnames){
 
   del_col_info[1] <- del_col
   del_col_info[2] <- d_colnames[del_col]
-
-  # these columns appear in the results for all controllers
-  del_col_info[(del_col_info$Index==2), 3] <- "Auto (md5 hash usually not needed for analysis)"
-  del_col_info[(del_col_info$Index==3), 3] <- "Auto (only one controller exists)"
-  del_col_info[(del_col_info$Index==5), 3] <- "Auto (only one elem.number exists)"
-  del_col_info[(del_col_info$Index==7), 3] <- "Auto (contains only NULL values)"
-
-  # these ones appear only for "double" controllers such as
-  # DashedAcceptabilityJudgment
-  del_col_info[(del_col_info$Index==10), 3] <- "Auto (contains only NULL values)"
-  del_col_info[(del_col_info$Index==15), 3] <- "Auto (contains only NULL values)"
-  del_col_info[(del_col_info$Index==11), 3] <- "Auto (contains only FALSE values)"
-
-  # Make note of which columns were requested to be deleted by the user - they
-  # will have "user" as the name of the element in the vector
-  del_col_info[del_col_info$Index %in% del_col[names(del_col) == "user"], 3] <-  "User request"
+  del_col_info[3] <- names(del_col)
+#
+#   # these columns appear in the results for all controllers
+#   del_col_info[(del_col_info$Index==2), 3] <- "Auto (md5 hash usually not needed for analysis)"
+#   del_col_info[(del_col_info$Index==3), 3] <- "Auto (only one controller exists)"
+#   del_col_info[(del_col_info$Index==5), 3] <- "Auto (only one elem.number exists)"
+#   del_col_info[(del_col_info$Index==7), 3] <- "Auto (contains only NULL values)"
+#
+#   # these ones appear only for "double" controllers such as
+#   # DashedAcceptabilityJudgment
+#   del_col_info[(del_col_info$Index==10), 3] <- "Auto (contains only NULL values)"
+#   del_col_info[(del_col_info$Index==15), 3] <- "Auto (contains only NULL values)"
+#   del_col_info[(del_col_info$Index==11), 3] <- "Auto (contains only FALSE values)"
+#
+#   # Make note of which columns were requested to be deleted by the user - they
+#   # will have "user" as the name of the element in the vector
+#   del_col_info[del_col_info$Index %in% del_col[names(del_col) == "user"], 3] <-  "User request"
 
   return(del_col_info)
 
@@ -273,13 +297,13 @@ report_del_col <- function(del_col, d_colnames){
                user = {
                  if (!is.null(del_col)) {
                    del_col <- sort(unique(del_col)) # use columns provided by the user
-                   names(del_col) <- rep("user", times = length(del_col)) # and remember that they were provided by the user
+                   names(del_col) <- rep("User request", times = length(del_col)) # and remember that they were provided by the user
                  }
                },
 
                mixed = {
                  del_col <- unique(del_col)
-                 names(del_col) <- rep("user", times = length(del_col))
+                 names(del_col) <- rep("User request", times = length(del_col))
                  del_col_auto <- auto_determine_del_col(d)
                  del_col <- sort(c(del_col, del_col_auto[!del_col_auto %in% del_col]))
                })
