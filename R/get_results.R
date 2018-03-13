@@ -17,6 +17,7 @@ read_ibex <- function(file_name, ...){
                 col.names= paste0("V", seq_len(n_cols)), # make sure that all columns are read in
                 stringsAsFactors = FALSE,
                 ...)
+
   return(d)
 
 }

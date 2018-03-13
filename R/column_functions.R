@@ -112,8 +112,13 @@ make_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TR
   # unless we provided a full set of column classes, provide default classes for
   # the first seven columns
   if (partial_classes){
-    col_classes <-  c("character", "character", "character",
-                    "numeric","numeric", "character","factor",
+    col_classes <-  c("character",
+                      "character",
+                      "character",
+                      "numeric",
+                      "numeric",
+                      "character",
+                      "factor",
                     col_classes)
   }
 
@@ -183,8 +188,13 @@ auto_determine_del_col <- function(d){
   # For "DashedSentence" in "self-paced reading" mode Column 11 contains info
   # on whether there was a line break between the current and the following word.
   # If all sentences in the experiment fit on the same line, this column always
-  # contains FALSE and thus is not necessary
+  # contains FALSE and thus is not necessary.
+  # Same for "Acceptability Judgment", only we don't need to account for mode
   if (all(d[,3] == "DashedSentence") && ncol(d) >= 12 && all(d[,11] == FALSE)){
+    del_col <- c(del_col, `Auto (contains only FALSE values)` = 11)
+  }
+
+  if (all(d[,3] == "AcceptabilityJudgment" | all(d[,3] == "DashedAcceptabilityJudgment")) && all(d[,11] == FALSE)){
     del_col <- c(del_col, `Auto (contains only FALSE values)` = 11)
   }
 
@@ -192,7 +202,7 @@ auto_determine_del_col <- function(d){
   # answered correctly. If an answer was not specified in Ibex, this column
   # will always contain NULLs and thus is not necessary
 
-  if (all(d[,3] == "Question") && all(is.null(d[,10]))){
+  if (all(d[,3] == "Question" | all(d[,3] == "DashedAcceptabilityJudgment")) && all(is.na(d[,10]))){
     del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
   }
 
