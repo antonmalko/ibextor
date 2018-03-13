@@ -11,7 +11,7 @@ read_ibex <- function(file_name, ...){
   # col_names <- set_column_names(n_cols, col_names, partial_names)
   # col_classes <- set_column_classes(n_cols, col_classes, partial_classes)
 
-  n_cols <- max(count.fields(file_name, sep = ","))
+  n_cols <- max(count.fields(file_name, sep = ","), na.rm = TRUE)
   # read the file
   d <- read.csv(file_name, header=FALSE, fill=TRUE, comment.char="#",
                 col.names= paste0("V", seq_len(n_cols)), # make sure that all columns are read in
