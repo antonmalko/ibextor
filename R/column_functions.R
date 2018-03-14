@@ -194,18 +194,26 @@ auto_determine_del_col <- function(d){
     del_col <- c(del_col, `Auto (contains only FALSE values)` = 11)
   }
 
-  if (all(d[,3] == "AcceptabilityJudgment" | all(d[,3] == "DashedAcceptabilityJudgment")) && all(d[,11] == FALSE)){
+  if (all(d[,3] == "DashedAcceptabilityJudgment") && ncol(d) >= 12 && all(d[,11] == FALSE)){
     del_col <- c(del_col, `Auto (contains only FALSE values)` = 11)
   }
 
-  # For "Question", Column 10 contains the info on whether the question was
-  # answered correctly. If an answer was not specified in Ibex, this column
-  # will always contain NULLs and thus is not necessary
+  # For "Question", "AcceptabilityJudgment" and "DashedAcceptabilityJudgment" in
+  # "speeded acceptability" mode, Column 10 contains the info on whether the
+  # question was answered correctly. If an answer was not specified in Ibex,
+  # this column will always contain NULLs and thus is not necessary
 
-  if (all(d[,3] == "Question" | all(d[,3] == "DashedAcceptabilityJudgment")) && all(is.na(d[,10]))){
+  if (all(d[,3] == "Question" ) && all(is.na(d[,10]))){
     del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
   }
 
+  if (all(d[,3] == "AcceptabilityJudgment" ) && all(is.na(d[,10]))){
+    del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
+  }
+
+  if (all(d[,3] == "DashedAcceptabilityJudgment" ) && all(is.na(d[,10]))){
+    del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
+  }
 
   return(del_col)
 }
