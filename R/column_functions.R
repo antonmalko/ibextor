@@ -269,21 +269,20 @@ delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixe
   #'@param d data.frame the columns of which are to be deleted
   #'@param del_col numeric. Vector of column numbers to be deleted.
   #'@param del_mode how to determine which columns have to be deleted. Can be
-  #'  one of: `auto` (decide based on data), `user` (only take into account
-  #'  user's requests), `mixed` (take into account user request and data).
-  #'  `auto` is used by default if "del_col" is not specified; if it is, `mixed`
+  #'  one of: \dQuote{auto} (decide based on data), \dQuote{user} (only take into account
+  #'  user's requests), \dQuote{mixed} (take into account user request and data).
+  #'  \dQuote{auto} is used by default if "del_col" is not specified; if it is, \dQuote{mixed}
   #'  is used. See Details
-  #'@param verbose logical. If `TRUE` (default), report which columns were
+  #'@param verbose logical. If \code{TRUE} (default), report which columns were
   #'  deleted and why.
   #'@return data.frame `d` with deleted columns
-  #'@export
   #'
   #'@details
   #'
   #'The first seven columns in IBEX results always are: \enumerate{ \item Time
   #'the results are received \item MD5 hash of participant's IP \item Controller
   #'type \item Item number \item Element number \item Type \item Group } By
-  #'default, the deletion mode is `auto`. It means that the function will remove
+  #'default, the deletion mode is \dQuote{auto}. It means that the function will remove
   #'columns not containing useful information. This means:
   #'
   #'\itemize{ \item "md5 hash" column is always removed since it's not usually
@@ -296,15 +295,15 @@ delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixe
   #'The above applies to all controllers. In addition:
   #'
   #'\itemize{ \item for DashedSentence and DashedAccpetabilityJudgment column 11
-  #'("line break") is removed if it only contains `FALSE` values. \item For
+  #'("line break") is removed if it only contains \code{FALSE} values. \item For
   #'DashedAcceptabilityJudgment only column 15 ("is.correct") is removed if it
-  #'contains only `NULL` valuess (if this is the case, it means that correct
+  #'contains only \code{NULL} valuess (if this is the case, it means that correct
   #'answers were not specified in IBEX, so this column is of no use). }
   #'
-  #'In `user` deletion mode the data will not be taken into account at all, and
+  #'In \dQuote{user} deletion mode the data will not be taken into account at all, and
   #'only the columns specified by user will be deleted.
   #'
-  #'In `mixed` deletion mode the columns to delete are the union of the sets of
+  #'In \dQuote{mixed} deletion mode the columns to delete are the union of the sets of
   #'automatically deleted columns and user-specified columns.
 
   # by default, choose auto deletion
