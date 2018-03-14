@@ -253,57 +253,51 @@ report_del_col <- function(del_col, d_colnames){
 
 }
 
-delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixed")){
-  #' A function to delete columns from the data based on data and/or user requests.
+delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixed"),
+                           verbose = TRUE){
+  #'A function to delete columns from the data based on data and/or user
+  #'requests.
   #'
-  #' @param d data.frame the columns of which are to be deleted
-  #' @param del_col numeric. Vector of column numbers to be deleted.
-  #' @param del_mode how to determine which columns have to be deleted. Can be one of:
-  #'          `auto` (decide based on data), `user` (only take into account
-  #'          user's requests), `mixed` (take into account user request and data).
-  #'          `auto` is used by default if "del_col" is not specified; if it is,
-  #'          `mixed` is used. See Details
-  #' @return data.frame `d` with deleted columns
-  #' @export
+  #'@param d data.frame the columns of which are to be deleted
+  #'@param del_col numeric. Vector of column numbers to be deleted.
+  #'@param del_mode how to determine which columns have to be deleted. Can be
+  #'  one of: `auto` (decide based on data), `user` (only take into account
+  #'  user's requests), `mixed` (take into account user request and data).
+  #'  `auto` is used by default if "del_col" is not specified; if it is, `mixed`
+  #'  is used. See Details
+  #'@param verbose logical. If `TRUE` (default), report which columns were
+  #'  deleted and why.
+  #'@return data.frame `d` with deleted columns
+  #'@export
   #'
-  #' @details
+  #'@details
   #'
-  #' The first seven columns in IBEX results always are:
-  #' \enumerate{
-  #' \item Time the results are received
-  #' \item MD5 hash of participant's IP
-  #' \item Controller type
-  #' \item Item number
-  #' \item Element number
-  #' \item Type
-  #' \item Group
-  #'}
-  #' By default, the deletion mode is `auto`. It means that the function will
-  #' remove columns not containing useful information. This means:
+  #'The first seven columns in IBEX results always are: \enumerate{ \item Time
+  #'the results are received \item MD5 hash of participant's IP \item Controller
+  #'type \item Item number \item Element number \item Type \item Group } By
+  #'default, the deletion mode is `auto`. It means that the function will remove
+  #'columns not containing useful information. This means:
   #'
-  #' \itemize{
-  #' \item "md5 hash" column is always removed since it's not usually used in analyses
-  #' \item "controller" column is removed if there is just one controller in the data -
-  #'   it is assumed, the user will know what controller that is
-  #' \item "element number" column is removed if that column only contains zeros
-  #' \item "group" column is removed if it only contains `NULL` values
-  #' }
+  #'\itemize{ \item "md5 hash" column is always removed since it's not usually
+  #'used in analyses \item "controller" column is removed if there is just one
+  #'controller in the data - it is assumed, the user will know what controller
+  #'that is \item "element number" column is removed if that column only
+  #'contains zeros \item "group" column is removed if it only contains `NULL`
+  #'values }
   #'
-  #' The above applies to all controllers. In addition:
+  #'The above applies to all controllers. In addition:
   #'
-  #' \itemize{
-  #' \item for DashedSentence and DashedAccpetabilityJudgment column 11 ("line break")
-  #' is removed if it only contains `FALSE` values.
-  #' \item For DashedAcceptabilityJudgment only column 15 ("is.correct") is removed
-  #' if it contains only `NULL` valuess (if this is the case, it means that correct
-  #' answers were not specified in IBEX, so this column is of no use).
-  #' }
+  #'\itemize{ \item for DashedSentence and DashedAccpetabilityJudgment column 11
+  #'("line break") is removed if it only contains `FALSE` values. \item For
+  #'DashedAcceptabilityJudgment only column 15 ("is.correct") is removed if it
+  #'contains only `NULL` valuess (if this is the case, it means that correct
+  #'answers were not specified in IBEX, so this column is of no use). }
   #'
-  #' In `user` deletion mode the data will not be taken into account at all, and
-  #' only the columns specified by user will be deleted.
+  #'In `user` deletion mode the data will not be taken into account at all, and
+  #'only the columns specified by user will be deleted.
   #'
-  #' In `mixed` deletion mode the columns to delete are the union of the sets of
-  #' automatically deleted columns and user-specified columns.
+  #'In `mixed` deletion mode the columns to delete are the union of the sets of
+  #'automatically deleted columns and user-specified columns.
 
   # by default, choose auto deletion
   del_mode <- match.arg(del_mode)
@@ -337,12 +331,14 @@ delete_columns <- function(d, del_col = NULL, del_mode = c("auto", "user", "mixe
   d[del_col] <- list(NULL)
 
   # report deleted columns
-  if (length(del_col) > 0){
-    cat ("\n", NROW(del_col_info)," column(s) deleted:\n\n")
-    print(del_col_info, right=FALSE, row.names=FALSE)
-    cat("\n")
-  } else {
-    cat ("\nNo columns were deleted\n")
+  if (verbose){
+    if (length(del_col) > 0){
+      cat ("\n", NROW(del_col_info)," column(s) deleted:\n\n")
+      print(del_col_info, right=FALSE, row.names=FALSE)
+      cat("\n")
+    } else {
+      cat ("\nNo columns were deleted\n")
+    }
   }
 
   return(d)
