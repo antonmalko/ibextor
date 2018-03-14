@@ -12,20 +12,20 @@ get_subj_info <- function (file_name,
   #' @param form_name character. Useful if you have several Forms collecting
   #'   different info throughout the experiment. In this case form.name should
   #'   specify which of those Forms collected subject info you're interested in.
-  #'   By default (in IBEX and here) it's "intro". You can also pass a vector
+  #'   By default (in IBEX and here) it's \dQuote{intro}. You can also pass a vector
   #'   with several form names.
   #' @param info character vector, describing which info about subjects you want
   #'   to extract (i.e. the names of the fields you specified in IBEX, e.g.
-  #'   "age", "sex" etc). If `NULL` (deault), all the available info will be
+  #'   "age", "sex" etc). If \code{NULL} (deault), all the available info will be
   #'   extracted.
   #' @param browser_info logical. Whether to extract subject's browser info or not
-  #'   (defaults to `FALSE`).
-  #' @param short_subj_ids logical. If `FALSE`, just merge timestamp and md5 hash
-  #'   together, If `TRUE` (default), add a new column with a simple index to
+  #'   (defaults to \code{FALSE}).
+  #' @param short_subj_ids logical. If \code{FALSE}, just merge timestamp and md5 hash
+  #'   together, If \code{TRUE} (default), add a new column with a simple index to
   #'   idenitfy subjects. One index is assigned to each combination of timestamp
-  #'   and browser md5 hash. The column is put at the place of `subj_uid`
-  #'   column, and `subj_uid` column is moved at the very end of the data.frame.
-  #' @param verbose logical. If `TRUE`, print the number of subjects and the kinds
+  #'   and browser md5 hash. The column is put at the place of \dQuote{subj_uid}
+  #'   column, and \dQuote{subj_uid} column is moved at the very end of the data.frame.
+  #' @param verbose logical. If \code{TRUE}, print the number of subjects and the kinds
   #'   of information extracted.
   #' @return data.frame with subject info
   #' @export
