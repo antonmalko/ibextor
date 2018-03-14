@@ -6,6 +6,9 @@ get_results_q <- function(file_name,
                           short_subj_ids = TRUE,
                           ...) {
 
+  #' @rdname get_results
+  #' @export
+
   if (is.null(col_names)){
     col_names <- c("question",
                    "answer",

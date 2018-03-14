@@ -8,7 +8,8 @@ get_results_daj <- function(file_name,
                            sprt = TRUE,
                            ...) {
 
-# TODO: Finish refactoring this spagetti
+  #' @rdname get_results
+  #' @export
 
 
   res <- read_ibex(file_name, ...)
@@ -76,7 +77,7 @@ get_results_daj <- function(file_name,
     if (is.null(col_names)){
       col_names <- c("question",
                      "answer",
-                     "is.correct",
+                     "is_correct",
                      "rt",
                      "sentence")
     }

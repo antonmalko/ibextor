@@ -5,6 +5,10 @@ get_results_fs <- function(file_name,
                            col_classes = NULL, partial_classes = TRUE,
                            short_subj_ids = TRUE,
                            ...){
+
+  #' @rdname get_results
+  #' @export
+
   if (is.null(col_names)){
     col_names <- c("sentence")
   }
