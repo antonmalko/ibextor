@@ -24,7 +24,7 @@ make_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
   #' @param col_names character vector with names for the columns
   #' @param partial_names logical. If `TRUE`, the first seven columns will receive
   #'                      default names (`subject`, `md5_hash`, `controller`,
-  #'                      `item_number`, `element_number`, `type`, `group`),
+  #'                      `presentation_order`, `element_number`, `type`, `item`),
   #'                      since these columns are the same in all (default)
   #'                      Ibex controllers. So `col_names` will be taken to
   #'                      specify names for columns starting from 8.
@@ -51,10 +51,10 @@ make_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
     col_names <-  c("timestamp",
                     "md5_hash",
                     "controller",
-                    "item_number",
+                    "presentation_order",
                     "element_number",
                     "type",
-                    "group", col_names)
+                    "item", col_names)
   }
 
   # If there are more column names specified than there are columns in the data,
