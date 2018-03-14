@@ -6,7 +6,7 @@ get_subj_info <- function (file_name,
                           verbose = TRUE,
                           ...) {
 
-  #' Extract subjects infor from Ibex data
+  #' Extract subjects info from Ibex data
   #'
   #' @param file_name character. Path to the file with Ibex results
   #' @param form_name character. Useful if you have several Forms collecting
