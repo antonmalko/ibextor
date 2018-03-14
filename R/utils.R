@@ -26,31 +26,6 @@ check_missing <-  function (x, string, name) {
 
 }
 
-# numbers_only <- function (x){
-#     res <- suppressWarnings(is.na(sapply((x), as.numeric)))
-#     if (length(which(res)) > 0) return (which(res))
-#     else return (NULL)
-#   }
-#
-#
-# which_not_numbers <-  function (x, names=TRUE){
-#     NaN.ind <- numbers.only(levels(x))
-#     if (!is.null(NaN.ind)) {
-#       if (names) {return (as.character(levels(x)[NaN.ind]))}
-#       else return (grep("[^1234567890]", x))
-#     }
-#     else return(NULL)
-#   }
-#
-#
-# check_numeric <-  function(x, col_name) {
-#     NaN.values <- which.not.numbers (x)
-#     if (!is.null(NaN.values)) {
-#       message ("\nApart from numeric values ", col.name," column contains also the following values: \"",
-#                paste0(NaN.values, collapse="\", \""), "\". They are coerced to NAs")
-#     }
-#   }
-
 recode_subjects <- function(d, short_ids = TRUE){
 
   #' Set unique subject IDs
@@ -85,3 +60,30 @@ recode_subjects <- function(d, short_ids = TRUE){
 
   return(d)
 }
+
+# numbers_only <- function (x){
+#     res <- suppressWarnings(is.na(sapply((x), as.numeric)))
+#     if (length(which(res)) > 0) return (which(res))
+#     else return (NULL)
+#   }
+#
+#
+# which_not_numbers <-  function (x, names=TRUE){
+#     NaN.ind <- numbers.only(levels(x))
+#     if (!is.null(NaN.ind)) {
+#       if (names) {return (as.character(levels(x)[NaN.ind]))}
+#       else return (grep("[^1234567890]", x))
+#     }
+#     else return(NULL)
+#   }
+#
+#
+# check_numeric <-  function(x, col_name) {
+#     NaN.values <- which.not.numbers (x)
+#     if (!is.null(NaN.values)) {
+#       message ("\nApart from numeric values ", col.name," column contains also the following values: \"",
+#                paste0(NaN.values, collapse="\", \""), "\". They are coerced to NAs")
+#     }
+#   }
+
+
