@@ -257,8 +257,8 @@ auto_determine_del_col <- function(d){
     del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
   }
 
-  if (all(d[,3] == "DashedAcceptabilityJudgment" ) && all(is.na(d[,10]))){
-    del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
+  if (all(d[,3] == "DashedAcceptabilityJudgment" ) && all(is.na(d[,15]))){
+    del_col <- c(del_col, `Auto (contains only NULL values)` = 15)
   }
 
   return(del_col)

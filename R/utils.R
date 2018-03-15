@@ -257,7 +257,7 @@ add_quest_lines <- function(sent_lines){
   sent_quest_idx <- sort(c(sent_idx, edges + 1))
 
   # convert the indices back to logical vectors. Make a dummy vector of "all"
-  # sentence lines and see which we need to select
+  # sentence lines and see which we need to selectlog
   res <- 1:length(sent_lines)
   res <- res %in% sent_quest_idx
 
