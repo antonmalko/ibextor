@@ -31,8 +31,9 @@ get_results_daj <- function(file_name,
            "data collection, while you are requesting `self-paced reading` (sprt = TRUE)")
     } else { # if the data is a mixture of both, only pick one subset
       warning("The data seems to contain a mixture of sentences in `self-paced reading` and ",
-              "`speeded acceptability` mode. Will only choose those agreeing with `sprt` parameter ",
-              "(`self-paced` for sprt = TRUE and `speeded acceptability` for sprt = FALSE)")
+              "`speeded acceptability` mode. Will only choose sentence for ",
+              ifelse(sprt, "self-paced reading", "speeded acceptability"), " mode",
+              " since sprt = ", sprt)
     }
   }
 
