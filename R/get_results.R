@@ -53,6 +53,8 @@
 #'
 #'@details
 #'
+#'@section Column deletion:
+#'
 #'The first seven columns in IBEX results always are: \enumerate{ \item Time the
 #'results are received \item MD5 hash of participant's IP \item Controller type
 #'\item Item presentation order \item Element number \item Type \item Item }
@@ -93,6 +95,14 @@
 #'
 #'In \dQuote{mixed} deletion mode the columns to delete are the union of the
 #'sets of automatically deleted columns and user-specified columns.
+#'
+#'@section Specific functions:
+#'
+#'\dQuote{DashedSentence} and \dQuote{DashedAcceptabilityJudgment} have two modes
+#'of data presentation: \dQuote{self-paced reading} and \dQuote{acceptability judgment}.
+#'If an experiment used those controllers in both mode, the corresponding
+#'functions will issue a watning and only select results consistent with \code{sprt}
+#'parameter.
 #'
 #'@return \code{data.frame} with the preprocessed data associated with the requested controller
 #'
