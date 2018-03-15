@@ -182,6 +182,87 @@ recode_subjects <- function(d, short_ids = TRUE){
   return(d)
 }
 
+detect_sprt_lines <- function(d){
+  #' Find which lines come from \dQuote{self-paced reading} mode
+  #'
+  #' It does so by taking column 10 and trying to convert it to numeric. For
+  #' data in \dQuote{self-paced reading} this column will contain RTs, so
+  #' the conversion will be successful.
+  #'
+  #' @param d \code{data.frame} with Ibex data which only contains rows coming
+  #'   from \dQuote{DashedSentence} or \dQuote{DashedAcceptabilityJudgment}
+  #'   controllers
+  #' @return logical vector corresponding to rows in sprt mode.
+
+
+  sprt_lines <- !suppressWarnings((is.na(as.numeric(d[[10]]))))
+  return(sprt_lines)
+}
+
+detect_sa_lines <- function(d){
+  #' Find which lines come from \dQuote{speeded acceptability} mode
+  #'
+  #' It does so by checking whether column 11 is empty. Speeded acceptability
+  #' data only has 8 columns, so it will be true for it (and false for self-paced
+  #' reading data or question data).
+  #'
+  #' @param d \code{data.frame} with Ibex data which only contains rows coming
+  #'   from \dQuote{DashedSentence} or \dQuote{DashedAcceptabilityJudgment}
+  #'   controllers
+  #' @return logical vector corresponding to rows in speeded acceptability mode.
+
+  sa_lines <- d[[11]] == ""
+  return(sa_lines)
+}
+
+add_quest_lines <- function(sent_lines){
+  #' Find question lines in DAJ Ibex controllers
+  #'
+  #' DashedAcceptabilityJudgment obligatorily adds lines corresponding to the
+  #' question data immediately after the sentence data. Thus, knowing which lines
+  #' correspond to last lines of sentence data, we can find queestion data by looking at
+  #' the immediately following line.
+  #' @param sent_lines \code{logical} vector indicating which lines contain sentence data
+  #' @return \code{logical} vector indicating whcih lines contain sentence AND question data
+
+  # The algorithm below will find the indices corresponding to the last lines
+  # in sentence data
+
+  # get indices of sentence lines
+  sent_idx <- which(sent_lines)
+
+  # if there are no sentence lines, do nothing
+  if (length(sent_idx) == 0){
+    return(sent_lines)
+  }
+
+  # if there is just one sentence line, it obviously is also a last line of
+  # a sentence data
+  if (length(sent_idx) == 1){
+    edges <- sent_idx
+  } else { # if there are several sentence lines
+    # check indices of sentence lines pairwise indices and find those which
+    # are not adjacent. E.g. if we have sentence lines c(3,4,7), the first two
+    # come from the first sentence, but the last two are not
+  edges <- sent_idx[sapply(2:length(sent_idx), function(i){
+    sent_idx[i] - sent_idx[i-1] > 1
+    })]
+  # add the last sentence line index - it's obviously a last line of a sentence
+  # data
+  edges <- unique(c(edges, sent_idx[length(sent_idx)]))
+  }
+
+  # now, get the indices of question lines (edges+1)
+  # and add them to the sentence indices
+  sent_quest_idx <- sort(c(sent_idx, edges + 1))
+
+  # convert the indices back to logical vectors. Make a dummy vector of "all"
+  # sentence lines and see which we need to select
+  res <- 1:length(sent_lines)
+  res <- res %in% sent_quest_idx
+
+  return(res)
+}
 
 
 # numbers_only <- function (x){

@@ -16,8 +16,34 @@ get_results_daj <- function(file_name,
   res <- subset_ibex(res, controller = "DashedAcceptabilityJudgment",
                      elem_number = elem_number)
 
+  sprt_lines <- detect_sprt_lines(res)
+
+  if (all(sprt_lines) == TRUE & !sprt){ # if the auto detection says it sprt, but the user requested speeded acceptability
+    stop("Column 10 doesn't contain numeric data or there are more than 11 columns in the data.
+         It is possible that you are subsetting for the wrong controller, or that the mode of ",
+         "DashedSentence controller was set to `self-paced reading` during ",
+         "data collection, while you are requesting `acceptability judgment` (sprt = FALSE)")
+  } else {
+    if (!any(sprt_lines) == TRUE & sprt) { # if the auto detection says it speeded acceptability, but the user requested sprt
+      stop("Column 8 contains non-numeric data, which it shouldn't. It is possible ",
+           "that you are subsetting for the wrong controller, or that the mode of ",
+           "DashedSentence controller was set to `acceptability judgment` during ",
+           "data collection, while you are requesting `self-paced reading` (sprt = TRUE)")
+    } else { # if the data is a mixture of both, only pick one subset
+      warning("The data seems to contain a mixture of sentences in `self-paced reading` and ",
+              "`speeded acceptability` mode. Will only choose those agreeing with `sprt` parameter ",
+              "(`self-paced` for sprt = TRUE and `speeded acceptability` for sprt = FALSE)")
+    }
+  }
+
+
+
   # --------- 1. Speeded acceptability mode ----------------------
   if (sprt){
+
+    # if the mode is sprt, just add question lines to sprt lines and extract them
+    extract_lines <- add_quest_lines(sprt_lines)
+    res <- res[extract_lines,]
 
     if (is.null(col_names)){
       col_names <- c("region",
@@ -43,13 +69,6 @@ get_results_daj <- function(file_name,
                        "numeric")
     }
 
-    if (any(is.na(as.numeric(res[[8]])))){
-      stop("Column 8 contains non-numeric data, which it shouldn't. It is possible ",
-           "that you are subsetting for the wrong controller, or that the mode of ",
-           "DashedSentence controller was set to `acceptability judgment` during ",
-           "data collection, while you are requesting `self-paced reading` (sprt = TRUE)")
-    }
-
     # Subset for sentences
     res_sent <- res[res[,12]!="",  ]
     if (NROW(res_sent)==0) stop ("Subsetting for sentence data failed")
@@ -61,8 +80,12 @@ get_results_daj <- function(file_name,
     if (NROW (res_quest)==0) stop ("Failed to get questions data")
     rownames(res_quest) <- NULL
 
-    # merge on the 4th column, which is item number
-    res <- merge(res_sent, res_quest, by = 4, sort = FALSE)
+    # merge on the 4th column, which is item number.
+    # The subsetting at the end prevent "merge" from reordering the columns,
+    # otherwise, it puts the "by" column first, which messes up later
+    # column naming, class assignment and column deletion
+    res <- merge(res_sent, res_quest, by.x = 4, by.y = 1, sort = FALSE)
+    res <- res[, c(2:4, 1, 5:ncol(res))]
 
     res <- format_ibex(res,
                        col_names = col_names, partial_names = partial_names,
@@ -73,6 +96,10 @@ get_results_daj <- function(file_name,
 
 
     } else {
+
+    sa_lines <- detect_sa_lines(res)
+    extract_lines <- add_quest_lines(sa_lines)
+    res <- res[extract_lines,]
 
     if (is.null(col_names)){
       col_names <- c("question",
@@ -88,15 +115,6 @@ get_results_daj <- function(file_name,
                        "logical",
                        "numeric",
                        "character")
-    }
-
-
-    # if (!missing(sep.quest)) message ("Sep.quest parameter is not used if sprt=FALSE(default)\n")
-    if (NCOL(res) > 11){
-      stop("There are more than 11 columns in the data. It is possible ",
-           "that you are subsetting for the wrong controller, or that the mode of ",
-           "DashedSentence controller was set to `self-paced reading` during ",
-           "data collection, while you are requesting `acceptability judgment` (sprt = FALSE)")
     }
 
     res <- res[,1:11]
