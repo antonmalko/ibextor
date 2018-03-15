@@ -250,15 +250,15 @@ auto_determine_del_col <- function(d){
   # this column will always contain NULLs and thus is not necessary
 
   if (all(d[,3] == "Question" ) && all(is.na(d[,10]))){
-    del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
+    del_col <- c(del_col, `Auto (contains only NA values)` = 10)
   }
 
   if (all(d[,3] == "AcceptabilityJudgment" ) && all(is.na(d[,10]))){
-    del_col <- c(del_col, `Auto (contains only NULL values)` = 10)
+    del_col <- c(del_col, `Auto (contains only NA values)` = 10)
   }
 
   if (all(d[,3] == "DashedAcceptabilityJudgment" ) && all(is.na(d[,15]))){
-    del_col <- c(del_col, `Auto (contains only NULL values)` = 15)
+    del_col <- c(del_col, `Auto (contains only NA values)` = 15)
   }
 
   return(del_col)
