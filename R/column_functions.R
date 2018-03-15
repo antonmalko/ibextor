@@ -20,18 +20,31 @@ make_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
 
   #' A function to provide default names for columns and ensure that
   #' every column has a name
+  #'
   #' @param n_cols numeric. Number of columns in the data
-  #' @param col_names character vector with names for the columns
-  #' @param partial_names logical. If `TRUE`, the first seven columns will receive
-  #'                      default names (`subject`, `md5_hash`, `controller`,
-  #'                      `presentation_order`, `element_number`, `type`, `item`),
+  #' @param col_names character vector with names for the columns.
+  #' @param partial_names logical. If \code{TRUE}, the first seven columns will receive
+  #'                      default names (\dQuote{subject}, \dQuote{md5_hash}, \dQuote{controller},
+  #'                      \dQuote{presentation_order}, \dQuote{element_number},
+  #'                      \dQuote{type}, \dQuote{item}),
   #'                      since these columns are the same in all (default)
-  #'                      Ibex controllers. So `col_names` will be taken to
+  #'                      Ibex controllers. So \code{col_names} will be taken to
   #'                      specify names for columns starting from 8.
-  #'                      If `FALSE`, `col_names` will be taken as specifying names
-  #'                      for all columns
+  #'                      If \code{FALSE}, \code{col_names} will be taken as specifying names
+  #'                      for all columns. If there are fewer than 8 columns,
+  #'                      \code{partial_names} will always be taken to be \code{FALSE}.
   #' @return vector with column names
 
+  # If there are fewer than 8 columns, then assume that the names provided have
+  # to be applied to all columns (instead of applying them starting from the
+  # eighth column)
+  if (n_cols < 8) {
+    partial_names <- FALSE
+    warning("There are fewer than 8 columns in your data! Assuming `partial_names = FALSE`",
+            " (i.e. default Ibex column names are not used)")
+  }
+
+  # If columns names are not specified at all, make dummy names
   if (is.null(col_names)){
     if (partial_names) {
       col_names <- c (paste0("Col",seq(from=8, to=n_cols)))
@@ -82,26 +95,44 @@ make_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TR
 
   #' A function to provide default names for columns and ensure that
   #' every column has a name
-  #' @param n_cols numeric. Number of columns in the data
-  #' @param col_classes character vector with classes to be assumed for the columns
-  #' @param partial_classes logical. If `TRUE`, the first seven columns will receive
+  #' @param n_cols \code{numeric}. Number of columns in the data
+  #' @param col_classes \code{character} vector with classes to be assumed for the columns.
+  #'   Currently, the following classes are allowed: \dQuote{character}, \dQuote{numeric},
+  #'   \dQuote{integer}, \dQuote{logical}, \dQuote{factor}. Additionally, one may
+  #'   use \dQuote{asis}, if the class of a column should not be changed. If the class
+  #'   for a column is not specified explicitly, \dQuote{asis} will be assumed.
+  #'
+  #' @param partial_classes \code{logical}. If \code{TRUE}, the first seven columns will receive
   #'                      default classes:
   #'
-  #'                      + subject - `factor`
-  #'                      + md5_hash, controller, type, group - `character`,
-  #'                      + item_number, element_number - `numeric`,
+  #'                      + subject - \code{factor}
+  #'                      + md5_hash, controller, type, item - \code{character}
+  #'                       (notice that in Ibex items can be identified with character
+  #'                       strings, that's why item is not \code{numeric} by default),
+  #'                      + presentation_order, element_number - \code{numeric},
   #'
-  #'                      So `col_names` will be taken to specify classes for columns
-  #'                      starting from 8. If `FALSE`, `col_classes` will be taken
-  #'                      as specifying classes for all columns
+  #'                      So \code{col_names} will be taken to specify classes for columns
+  #'                      starting from 8. If \code{FALSE}, \code{col_classes} will be taken
+  #'                      as specifying classes for all columns. If there are less
+  #'                      than 8 columns, \code{partial classes} will always be taken
+  #'                      to be \code{FALSE}.
   #'
   #' @return vector with column classes
 
+  # If there are fewer than 8 columns, then assume that the names provided have
+  # to be applied to all columns (instead of applying them starting from the
+  # eighth column)
+  if (n_cols < 8) {
+    partial_classes <- FALSE
+    warning("There are fewer than 8 columns in your data! Assuming `partial_classes = FALSE`",
+            " (i.e. default Ibex column classes are not used)")
+  }
+
   if (is.null(col_classes)){
     if (partial_classes) {
-      col_classes <- rep(NA, times = n_cols - 7)
+      col_classes <- rep("asis", times = n_cols - 7)
     } else {
-      col_classes <- rep(NA, times = n_cols)
+      col_classes <- rep("asis", times = n_cols)
     }
   }
 
@@ -136,7 +167,7 @@ make_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TR
   # If there are fewer column classes specified than there are columns in the data,
   # allow classes to be selected automatically by downstream functions
   if (n_cols > length(col_classes))
-    col_classes <- c(col_classes, rep(NA, times = n_cols - length(col_classes)))
+    col_classes <- c(col_classes, rep("asis", times = n_cols - length(col_classes)))
   #warning("There are more columns than column classes provided. ",
   #        "The non-specified classes will be chosen automatically")
 
@@ -144,14 +175,29 @@ make_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TR
 }
 
 set_column_classes <- function(d, col_classes){
+  #' A function to change classes of multiple data.frame columns
+  #' @param d data.frame
+  #' @param col_classes character vector with classes to be assumed for the columns
+  #' @return data.frame with updated column classes
+
+  # recipe taken from
+  # https://stackoverflow.com/questions/7680959/convert-type-of-multiple-columns-of-a-dataframe-at-once
   res <- lapply(1:ncol(d), function(i){
     FUN <- switch(col_classes[i],
                   character = as.character,
                   numeric = as.numeric,
                   integer = as.integer,
-                  complex = as.complex,
                   logical = as.logical,
-                  factor = as.factor)
+                  factor = as.factor,
+                  asis = base::identity)
+
+    # If a name of the class is not reognized, do not change the column
+    if (is.null(FUN)){
+      warning("Column class name `",col_classes,"` is not recognized. The corresponding ",
+              "column class will not be changed")
+      FUN <- base::identity
+    }
+
     FUN(d[,i])
   })
 
