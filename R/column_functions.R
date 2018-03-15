@@ -286,22 +286,6 @@ report_del_col <- function(del_col, d_colnames){
   del_col_info[1] <- del_col
   del_col_info[2] <- d_colnames[del_col]
   del_col_info[3] <- names(del_col)
-#
-#   # these columns appear in the results for all controllers
-#   del_col_info[(del_col_info$Index==2), 3] <- "Auto (md5 hash usually not needed for analysis)"
-#   del_col_info[(del_col_info$Index==3), 3] <- "Auto (only one controller exists)"
-#   del_col_info[(del_col_info$Index==5), 3] <- "Auto (only one elem.number exists)"
-#   del_col_info[(del_col_info$Index==7), 3] <- "Auto (contains only NULL values)"
-#
-#   # these ones appear only for "double" controllers such as
-#   # DashedAcceptabilityJudgment
-#   del_col_info[(del_col_info$Index==10), 3] <- "Auto (contains only NULL values)"
-#   del_col_info[(del_col_info$Index==15), 3] <- "Auto (contains only NULL values)"
-#   del_col_info[(del_col_info$Index==11), 3] <- "Auto (contains only FALSE values)"
-#
-#   # Make note of which columns were requested to be deleted by the user - they
-#   # will have "user" as the name of the element in the vector
-#   del_col_info[del_col_info$Index %in% del_col[names(del_col) == "user"], 3] <-  "User request"
 
   return(del_col_info)
 
