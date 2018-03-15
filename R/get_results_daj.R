@@ -54,7 +54,7 @@ get_results_daj <- function(file_name,
                      "question",
                      "answer",
                      "is_correct",
-                     "rt")
+                     "quest_rt")
     }
 
     if (is.null(col_classes)){
@@ -105,7 +105,7 @@ get_results_daj <- function(file_name,
       col_names <- c("question",
                      "answer",
                      "is_correct",
-                     "rt",
+                     "quest_rt",
                      "sentence")
     }
 

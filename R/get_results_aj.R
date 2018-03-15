@@ -13,7 +13,7 @@ get_results_aj <- function(file_name,
       col_names <- c("question",
                      "answer",
                      "is_correct",
-                     "rt",
+                     "quest_rt",
                      "sentence")
     }
 

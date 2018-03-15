@@ -12,8 +12,8 @@ get_results_q <- function(file_name,
   if (is.null(col_names)){
     col_names <- c("question",
                    "answer",
-                   "is.correct",
-                   "rt")
+                   "is_correct",
+                   "quest_rt")
   }
 
   if (is.null(col_classes)){
