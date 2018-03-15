@@ -5,6 +5,8 @@ Authors@R: person("Anton", "Malko", email = "amalko@umd.edu", role = c("aut", "c
 Description: The package provides a set of convenience functions for
              extracting information from raw csv files produced by Ibex, an 
              on-line linguistic experiments platform (http://spellout.net/ibexfarm)
+URL: https://github.com/antonmalko/ibextor
+BugReports: https://github.com/antonmalko/ibextor/issues
 Depends: R (>= 3.3.2)
 License: GPL-3
 LazyData: true
