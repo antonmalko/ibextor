@@ -41,6 +41,9 @@ subset_ibex <- function(d,
   #'   exactly of those duplicate controllers you need.
   #' @return data frame with data for requested controllers / elements
 
+  # check that we have at least 8 columns - that's the minimum for Ibex dat
+  check_ibex_df(d)
+
   tmp <- check_missing(controller, d[[3]], "controllers")
   check_missing(elem_number, d[[5]], "elem.numbers")
 
@@ -136,6 +139,12 @@ check_missing <-  function (x, string, name) {
 
     invisible(length(missing_values))
 
+}
+
+check_ibex_df <- function(d){
+  if (ncol(d) < 8) {
+    stop("Ibex data has at least 8 columns, and your data has fewer than that.")
+  }
 }
 
 recode_subjects <- function(d, short_ids = TRUE){
