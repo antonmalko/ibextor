@@ -43,10 +43,14 @@ make_column_names <- function(n_cols, col_names = NULL, partial_names = TRUE){
   # If there are fewer than 8 columns, then assume that the names provided have
   # to be applied to all columns (instead of applying them starting from the
   # eighth column)
-  if (n_cols < 8) {
+  if (n_cols < 8 & n_cols > 0) {
     partial_names <- FALSE
     warning("There are fewer than 8 columns in your data! Assuming `partial_names = FALSE`",
             " (i.e. default Ibex column names are not used)")
+  }
+
+  if (n_cols < 1){
+    stop("Number of columns should be non-zero!")
   }
 
   # If columns names are not specified at all, make dummy names
@@ -127,10 +131,14 @@ make_column_classes <- function(n_cols, col_classes = NULL, partial_classes = TR
   # If there are fewer than 8 columns, then assume that the names provided have
   # to be applied to all columns (instead of applying them starting from the
   # eighth column)
-  if (n_cols < 8) {
+  if (n_cols < 8 & n_cols > 0) {
     partial_classes <- FALSE
     warning("There are fewer than 8 columns in your data! Assuming `partial_classes = FALSE`",
             " (i.e. default Ibex column classes are not used)")
+  }
+
+  if (n_cols < 1){
+    stop("Number of columns should be non-zero!")
   }
 
   if (is.null(col_classes)){
