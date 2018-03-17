@@ -8,11 +8,16 @@ count_columns <- function(file_name){
   # input checks
   if (!is.character(file_name)) stop("file_name should be character!")
 
-  n_cols <- max(count.fields(file_name, sep=",",comment.char="#", quote = "\""), na.rm = TRUE)
-  if (is.na(n_cols)) {
-    n_cols <- 12
-    warning ("Error while counting columns in the file. Assuming there are 12 columns")
-  }
+  tryCatch(n_cols <- max(count.fields(file_name, sep = ","comment.char="#",
+                                      quote = "\""),
+                         na.rm = TRUE),
+           warning = function(e){
+             if (grepl("no non-missing arguments to max", e$message)){
+               stop("The input file appears to be empty!")
+             }
+           }
+  )
+
   return(n_cols)
 }
 
