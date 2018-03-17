@@ -8,7 +8,7 @@ many of such steps:
 + Columns are automatically assigned appropriate names and data types
 + Columns not containing useful info are automatically deleted (e.g. the column 
 indicating whether the answer to a question was correct will contain only `NULL` 
-if the correct answer was not specified inthe Ibex script)
+if the correct answer was not specified in the Ibex script)
 + Controllers adding multiple lines to the data file (e.g. "DashedSentence") are
 "unrolled", so that all the info from an experimental item is contained in a single
 `data.frame`
