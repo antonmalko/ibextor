@@ -6,12 +6,10 @@ read_ibex <- function(file_name, ...){
   #' @param file_name character. Path to the file with Ibex results
   #' @return data frame with the contents of the file
 
-  # count the columns in the input file, set their names and classes
-  # n_cols <- count_columns(file_name)
-  # col_names <- set_column_names(n_cols, col_names, partial_names)
-  # col_classes <- set_column_classes(n_cols, col_classes, partial_classes)
+  # count the columns in the input file, to make sure it's not empty, and
+  # that we will read all of the
+  n_cols <- count_columns(file_name)
 
-  n_cols <- max(count.fields(file_name, sep = ","), na.rm = TRUE)
   # read the file
   d <- read.csv(file_name, header=FALSE, fill=TRUE, comment.char="#",
                 col.names= paste0("V", seq_len(n_cols)), # make sure that all columns are read in
@@ -104,6 +102,9 @@ format_ibex <- function(d,
   #'                      So `col_classes` will be taken to specify classes for columns
   #'                      starting from 8. If `FALSE`, `col_classes` will be taken
   #'                      as specifying classes for all columns
+  #'
+
+  check_ibex_df(d)
 
   n_cols <- ncol(d)
   col_names <- make_column_names(n_cols, col_names, partial_names)
@@ -142,6 +143,11 @@ check_missing <-  function (x, string, name) {
 }
 
 check_ibex_df <- function(d){
+
+  if(!is.data.frame(d)){
+    stop("The input for subsetting/formatting should be a data.frame")
+  }
+
   if (ncol(d) < 8) {
     stop("Ibex data has at least 8 columns, and your data has fewer than that.")
   }
