@@ -1,6 +1,11 @@
 # ibextor
 
-This package is intended to facilitate loading experimental data generated on [Ibex](http://spellout.net/ibexfarm) into R. Ibex data are stored in a simple .csv file,
+This package is a successor to **IBEX.to.R** package, which I posted a few years
+ago [here](https://groups.google.com/forum/#!topic/ibexexperiments/_b5eMmiCQTY).
+The current package is a much cleaner re-write of the old code, and has a couple 
+of new feautures.
+
+The goal of the package is to facilitate loading experimental data generated on [Ibex](http://spellout.net/ibexfarm) into R. Ibex data are stored in a simple .csv file,
 so loading it into R per se is easy. However, multiple preprocessing steps have to
 be carried on such raw data. The functions in this package automatically perform
 many of such steps:
