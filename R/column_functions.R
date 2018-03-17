@@ -8,7 +8,7 @@ count_columns <- function(file_name){
   # input checks
   if (!is.character(file_name)) stop("file_name should be character!")
 
-  tryCatch(n_cols <- max(count.fields(file_name, sep = ","comment.char="#",
+  tryCatch(n_cols <- max(count.fields(file_name, sep = ",", comment.char="#",
                                       quote = "\""),
                          na.rm = TRUE),
            warning = function(e){
